@@ -8,7 +8,7 @@ hardwareConfiguration.properties
 bin
 build
 src-gen
-# srcMore
+srcMore
 sites
 configuration
 .classpath
