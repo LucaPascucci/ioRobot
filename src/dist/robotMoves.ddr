@@ -9,7 +9,7 @@ Event obstacle : obstacle(X) //from red button and from SensorObserver
 Context ctxRobot ip [ host="192.168.137.2"  port=8079 ] -httpserver //riassegnare ip in base al wifi
 EventHandler evh for /*endmove,*/ alarm, obstacle, sensordata /*-print*/ { memo currentEvent for robot_actor };
 
-Robot ioRobot QActor robot_actor context ctxRobot /*-i*/  {
+Robot ioRobot QActor robot_actor context ctxRobot /*-i*/{
 	          
 	Rules{                      
 		tforward(10000). 
