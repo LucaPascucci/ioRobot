@@ -1,0 +1,13 @@
+# Add any directories, files, or patterns you don't want to be tracked by version control
+syntax: glob
+.hgignore
+.gitignore
+.gradle/
+hardwareConfiguration.properties
+bin
+build
+src-gen
+scrMore
+sites
+configuration
+.classpath
