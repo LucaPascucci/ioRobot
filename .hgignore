@@ -3,6 +3,7 @@ syntax: glob
 .hgignore
 .gitignore
 .gradle/
+.settings/
 hardwareConfiguration.properties
 bin
 build
