@@ -1,7 +1,7 @@
 %====================================================================================
 % Context ctxRobot  SYSTEM-configuration: file it.unibo.ctxRobot.robotSystem.pl 
 %====================================================================================
-context(ctxrobot, "192.168.137.2",  "TCP", "8079" ).  		 
+context(ctxrobot, "localhost",  "TCP", "8079" ).  		 
 %%% -------------------------------------------
 %%% -------------------------------------------
 eventhandler(evh,ctxrobot,"it.unibo.ctxRobot.Evh","alarm,obstacle,sensordata").  

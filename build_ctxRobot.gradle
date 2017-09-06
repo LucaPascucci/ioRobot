@@ -34,9 +34,9 @@ sourceSets {
 		}
 	}
 	test {
-		 java {
-		   srcDirs = ['test']
-		 }
+		java {
+		 	srcDirs = ['test']
+		}
 	}
 }
 /*
@@ -48,69 +48,73 @@ repositories {
       mavenCentral()
 }
 dependencies {
+
 /*
-BASIC SUPPORT (test, akka)
+	BASIC SUPPORT (test, akka)
 */	
-      testCompile 'junit:junit:4.12'
-     // https://mvnrepository.com/artifact/com.typesafe.akka/akka-actor_2.11
-	  compile group: 'com.typesafe.akka', name: 'akka-actor_2.11', version: '2.5.1'
-	 // https://mvnrepository.com/artifact/com.typesafe.akka/akka-remote_2.11
-	 compile group: 'com.typesafe.akka', name: 'akka-remote_2.11', version: '2.5.1'	 
+	testCompile 'junit:junit:4.12'
+	
+	// https://mvnrepository.com/artifact/com.typesafe.akka/akka-actor_2.11
+	compile group: 'com.typesafe.akka', name: 'akka-actor_2.11', version: '2.5.1'
+	// https://mvnrepository.com/artifact/com.typesafe.akka/akka-remote_2.11
+	compile group: 'com.typesafe.akka', name: 'akka-remote_2.11', version: '2.5.1'	 
      
 /*
-UNIBO SUPPORTS
+	UNIBO SUPPORTS
 */		
-	  compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'uniboInterfaces.jar')
-	  compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'unibonoawtsupports.jar')
-	  compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'uniboEnvBaseAwt.jar')
-	  compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: '2p301.jar')
-	  compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'qa18Akka.jar')
-	  compile fileTree(dir: '../it.unibo.iss.libs/libs/http',  include: 'nanoHTTPD.jar')
+	compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'uniboInterfaces.jar')
+	compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'unibonoawtsupports.jar')
+	compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'uniboEnvBaseAwt.jar')
+	compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: '2p301.jar')
+	compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'qa18Akka.jar')
+	compile fileTree(dir: '../it.unibo.iss.libs/libs/http',  include: 'nanoHTTPD.jar')
+
 /*
-JSON
-*/
-	  
-	  // https://mvnrepository.com/artifact/org.json/json
-	  compile group: 'org.json', name: 'json', version: '20160810'
+	JSON
+*/	  
+	// https://mvnrepository.com/artifact/org.json/json
+	compile group: 'org.json', name: 'json', version: '20160810'
 	  
 /*
-MQTT
+	MQTT
 */
- 	// https://mvnrepository.com/artifact/org.eclipse.paho/org.eclipse.paho.client.mqttv3
+	// https://mvnrepository.com/artifact/org.eclipse.paho/org.eclipse.paho.client.mqttv3
 	compile group: 'org.eclipse.paho', name: 'org.eclipse.paho.client.mqttv3', version: '1.1.0'
 
 /*
-TO BE ADDED by the application designer: BLUETOOTH
+*	TO BE ADDED by the application designer: BLUETOOTH
 */
-	  //compile fileTree(dir: '../it.unibo.iss.libs/libs/bth', include: 'bluecove-2.1.1-SNAPSHOT.jar')
-	  //compile fileTree(dir: '../it.unibo.iss.libs/libs/bth', include: 'bluecove-gpl-2.1.1-SNAPSHOT.jar')
+	//compile fileTree(dir: '../it.unibo.iss.libs/libs/bth', include: 'bluecove-2.1.1-SNAPSHOT.jar')
+	//compile fileTree(dir: '../it.unibo.iss.libs/libs/bth', include: 'bluecove-gpl-2.1.1-SNAPSHOT.jar')
 
 /*
-TO BE ADDED by the application designer: Raspberry GPIO support
+*	TO BE ADDED by the application designer: Raspberry GPIO support
 */	
-// https://mvnrepository.com/artifact/com.pi4j/pi4j-core
-//compile group: 'com.pi4j', name: 'pi4j-core', version: '1.1'
+	// https://mvnrepository.com/artifact/com.pi4j/pi4j-core
+	//compile group: 'com.pi4j', name: 'pi4j-core', version: '1.1'
+
 /*
-ROBOTS
+*	ROBOTS
 */ 	 
 	 compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'labbaseRobotSam.jar')
-	 compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'uniboQactorRobot.jar') 
+	 compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'uniboQactorRobot.jar')
+	 
 /*
-TO BE ADDED by the application designer for ButtonLed  
+*	TO BE ADDED by the application designer for ButtonLed  
 */	
-//compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'blsHL.jar')
-//compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'blsGUI.jar')
-//compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'blsRasp.jar')
+	//compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'blsHL.jar')
+	//compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'blsGUI.jar')
+	//compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'blsRasp.jar')
 
 /*
-TO BE ADDED by the application designer for: RXJAVA
+*	TO BE ADDED by the application designer for: RXJAVA
 */
 	//https://mvnrepository.com/artifact/io.reactivex.rxjava2/rxjava
 	//compile group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.0.6' 
 }
 
 /*
-TO BE ADDED by the application designer for : 
+*	TO BE ADDED by the application designer for : 
 */
 	// https://mvnrepository.com/artifact/log4j/log4j
     //compile group: 'log4j', name: 'log4j', version: '1.2.16'
@@ -126,6 +130,7 @@ test {
         println "Executing test ${desc.name} [${desc.className}] with result: ${result.resultType}"
     }
 }
+
 /*
 ---------------------------------------------------------------------
 JAR: incldes src-gen code (excluding Java) in the executable jar
@@ -143,6 +148,7 @@ distributions {
         baseName = "$mainClassName"
     }
 }
+
 /*
 ---------------------------------------------------------
 PREPARE DISTRIBUTION
