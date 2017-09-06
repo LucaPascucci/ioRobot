@@ -2,12 +2,84 @@ RobotSystem robotSystem
                         
 Event usercmd : usercmd(X)       
 Event sensordata : sensordata(X)  //from SensorObserver
-Event alarm : alarm(X) //from red button
+Event reachedsensor : reachedsensor(X) //from red button
 Event obstacle : obstacle(X) //from red button and from SensorObserver
 //Event endmove : endmove //from a robot move         
-  
-Context ctxRobot ip [ host="localhost"  port=8079 ] -httpserver
+
+Event inputcmd       : usercmd(executeInput(CMD)) //TODO guardare
+Event alarm          : alarm( obstacle, p( Distance, Angle  ) )
+Event sonar 		 : p( Distance, Angle ) 
+Event numOfSonar  	 : numOfSonar( N )
+
+Context  ctxRadar      ip [ host="192.168.137.1" port=8033 ] -g cyan -httpserver 
+EventHandler evhr for sonar ;
+Context  ctxSensorEmitter  ip [ host="192.168.137.2" port=8133 ]
+
+Context ctxRobot ip [ host="192.168.137.2"  port=8079 ]
 EventHandler evh for /*endmove,*/ alarm, obstacle, sensordata /*-print*/ { memo currentEvent for robot_actor };
+
+QActor  radargui context ctxRadar {   	  	
+Rules{
+	checknear( D,A ) :- eval( lt, D, 40 ), !, assert( obstacle(D,A) ).
+	checknear( D,A ).
+}  
+    Plan init normal         
+        println("RADAR init the GUI ... ") ;     
+        actorOp activateGui ;     
+        switchToPlan doWorkMsgs      
+    Plan doWorkMsgs 
+    	sense time(86400000) sonar -> continue;
+ 		onEvent sonar : p(D,A) -> actorOp sendDataToGui( D,A ) ; 
+        repeatPlan  
+    Plan checkObstacle resumeLastPlan //TODO questo è da fare / controllare
+ 		//onMsg polar : p(D,A) -> demo checknear(D,A);
+/*R3*/ 	[ ?? obstacle(D,A)  ] emit alarm : alarm( obstacle, p( D,A) )
+}
+
+QActor usercmdhandler context ctxRadar{	 
+    Plan init normal        
+       sense time(86400000) 
+       		inputcmd,alarm -> handleInput,handleAlarm ; /*R5*/
+       repeatPlan
+     Plan handleInput resumeLastPlan
+ 	//the user should insert from the web gui data such as p(80,30)
+/*R4*/ //onEvent inputcmd : usercmd(executeInput(p(D,A))) ->
+          //forward radargui -m polar : p(D,A) 
+     Plan handleAlarm resumeLastPlan
+         println("alarm") ;
+      	 sound time(2000) file('./audio/tada2.wav')
+}
+
+QActor sensorsonar context ctxSensorEmitter  {    
+Rules{
+  /* THESE RULES ARE WRITTEN IN THE WorldTheory of the sensorsonar */
+  /* CONFIGURATION */
+    onRaspberry. 
+    mysonar( s1, coloryellow, "192.168.137.2" ).
+    //mysonar( s2, colorred, "192.168.251.121" ).     
+    //mysonar( s3, colorgreen, "192.168.251.120" ).       
+ 	
+  /* RULES */
+    sonar(s1,330).
+    sonar(s2,30).
+//	sonar(s3,150).  
+    numOfSonars(N) :- bagof(sonar(S,P), sonar(S,P), SonarList), length(SonarList,N).
+    setmyposition :- numOfSonars(N), assert( numOfSonars( N ) ), mysonar( SONAR, _, _ ), sonar( SONAR,POS ), assert( position( POS ) ).   
+    //obstacledata( p(D,POS) ) :- actorOpDone( _,D ), position(POS). //actorOpDone( _,d(D) ) TODO trovare un modo per passare solo la distanza e non tutta la stringa generata
+  }    
+   Plan init normal     
+     println("sensorsonar STARTS")  ;
+    [ !? onRaspberry ] actorOp startSonarC;
+    demo setmyposition ;  //depends on mysonar
+    [ !? position(POS) ] println( position(POS) );
+    [ !? numOfSonars(N) ]  println( numOfSonars(N) );
+ 	[ !? numOfSonars(N) ]  emit numOfSonar : numOfSonar(N) ;
+    [ !? onRaspberry ] switchToPlan workReal 
+   Plan workReal 
+    [ !? position(POS) ] actorOp getDistanceFromSonar(POS) ; //(1)  //Dati reali prelevati dal sensore
+    [ ?? obstacledata( D,POS )] emit sonar : p(D,POS) ;
+    repeatPlan
+}
 
 Robot ioRobot QActor robot_actor context ctxRobot /*-i*/{
 	          
@@ -55,7 +127,7 @@ Robot ioRobot QActor robot_actor context ctxRobot /*-i*/{
    	Plan startWalking
    		println("startWalking");
    		//TODO aggiungere reazione a stop da console (usercmd)
-   		[!? tforward(T)] robotForward speed(100) time(T) react event obstacle -> stopWalking or event alarm -> reachedSensor; 
+   		[!? tforward(T)] robotForward speed(100) time(T) react event obstacle -> stopWalking or event reachedsensor -> reachedSensor; 
    		//time 0 means that runs forever until the next motor command
    		repeatPlan //ripete il plan all'infinito
    		
