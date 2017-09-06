@@ -1,0 +1,85 @@
+RobotSystem robotSystem  
+                        
+Event usercmd : usercmd(X)       
+Event sensordata : sensordata(X)  //from SensorObserver
+Event alarm : alarm(X) //from red button
+Event obstacle : obstacle(X) //from red button and from SensorObserver
+//Event endmove : endmove //from a robot move         
+  
+Context ctxRobot ip [ host="192.168.137.2"  port=8079 ] -httpserver //riassegnare ip in base al wifi
+EventHandler evh for /*endmove,*/ alarm, obstacle, sensordata /*-print*/ { memo currentEvent for robot_actor };
+
+Robot ioRobot QActor robot_actor context ctxRobot /*-i*/  {
+	          
+	Rules{                      
+		tforward(10000). 
+		tturn(800).
+		//TODO creare un distance(valore) runtime con valore distanza iniziale da B    
+	}
+	
+	Plan primiPassi resumeLastPlan
+	    println("primiPassi " )  ;
+    	robotForward speed(100) time(2000);
+    	delay time(1000);
+    	robotRight speed(100) time(2000); 
+    	delay time(1000);
+    	robotLeft speed(100) time (2000);
+    	delay time(1000);
+    	robotBackward speed(100) time(5000);
+    	println("primiPassi END")
+    	             
+	Plan reactToUsercmd resumeLastPlan  
+		println("reactToUsercmd in robot_actor" ) 
+		        
+	Plan reactToEvent          
+		println("reactToEvent in robot_actor" ) ;   
+		printCurrentEvent ;     
+		[ ?? stored( Ev,line(X,POS) ) ] println ("stored( Ev,line(X,POS)");//println("---> line("+ X + "," + POS +") " );    
+		[ ?? stored( Ev,distance(X,POS,SIDE) ) ] println ("stored( Ev,distance(X,POS,SIDE)") //println("--->" + X)    
+	
+	Plan doWork
+		[ !? tforward(X) ] println("stored( Ev,distance(X,POS,SIDE)"); //println("r0 forward for " + X + " secs" );     
+		[ !? tforward(X) ] robotForward speed(1000) time(X)  react event usercmd -> reactToUsercmd  or event sensordata -> reactToEvent;   
+		[ !? tturn(X) ] robotLeft speed(1000) time(X)  react event usercmd -> reactToUsercmd  or event sensordata -> reactToEvent;     
+		[ !? tforward(X) ] robotForward speed(1000) time(X)  react event usercmd -> reactToUsercmd; 
+   		println("doWork END ")
+   	
+   	Plan stopWalking
+   		println("stopWalking");
+   		printCurrentEvent ;
+   		robotForward speed(1) time(0);
+		//robotStop speed(10) time(0);
+		println("ioRobot stopped");
+		switchToPlan waitRepositioning
+   	
+   	Plan startWalking
+   		println("startWalking");
+   		//TODO aggiungere reazione a stop da console (usercmd)
+   		[!? tforward(T)] robotForward speed(100) time(T) react event obstacle -> stopWalking or event alarm -> reachedSensor; 
+   		//time 0 means that runs forever until the next motor command
+   		repeatPlan //ripete il plan all'infinito
+   		
+   	Plan reachedSensor resumeLastPlan
+   		println("reachedSensor");
+		robotStop speed(10) time(0);
+   		[!? tturn(T)] robotLeft speed(100) time (T); //girare a sinistra di 90°
+   		//TODO blink led
+   		//TODO fare una foto e mandarla alla console del radar
+   		[!? tturn(T)] robotRight speed(100) time (T) //girare a destra di 90°
+   		//TODO stop blink led
+   	
+   	Plan waitRepositioning
+   		println("Waiting repositioning...");
+   		//TODO confrontare valore distanza da B con valore distanza corrente
+   		repeatPlan
+   		
+ 	Plan init normal
+ 		//TODO memorizzare distanza massima da B
+ 		println("-------------");
+ 		println("ioRobot: A robot performs a move in reactive way (usercmd)"  )  ;
+		println("The moves can be stopped by pressing a button on the http GUI"  )  ;
+		println("-------------");
+		switchToPlan startWalking;
+  		println("---- FINE ----")
+ 		              
+}     

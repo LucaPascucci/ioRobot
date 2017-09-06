@@ -1,0 +1,15 @@
+/* 
+ * ===================================
+ * ioRobot
+ * ===================================
+ */
+ RobotBase ioRobot
+ //BASIC                          
+motorleft  = Motor  [ gpiomotor pincw 13 pinccw 12  ]  position: LEFT
+motorright = Motor  [ gpiomotor pincw 8 pinccw 9  ]  position: RIGHT
+//SENSORS
+distanceFront = Distance [ sonarhcsr04 pintrig 0 pinecho 2] position: FRONT_TOP
+//COMPOSED
+motors = Actuators [ motorleft , motorright  ] private position: BOTTOM
+Mainrobot ioRobot  [ motors ]  ;
+ 
