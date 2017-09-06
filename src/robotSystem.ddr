@@ -120,14 +120,13 @@ Robot ioRobot QActor robot_actor context ctxRobot /*-i*/{
    		println("stopWalking");
    		printCurrentEvent ;
    		robotForward speed(1) time(0);
-		//robotStop speed(10) time(0);
 		println("ioRobot stopped");
 		switchToPlan waitRepositioning
    	
    	Plan startWalking
    		println("startWalking");
    		//TODO aggiungere reazione a stop da console (usercmd)
-   		[!? tforward(T)] robotForward speed(100) time(T) react event obstacle -> stopWalking or event reachedsensor -> reachedSensor; 
+   		[!? tforward(T)] robotForward speed(100) time(T) react event obstacle -> reachedSensor or event reachedsensor -> reachedSensor; 
    		//time 0 means that runs forever until the next motor command
    		repeatPlan //ripete il plan all'infinito
    		
