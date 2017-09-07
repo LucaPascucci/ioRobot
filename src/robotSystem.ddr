@@ -48,7 +48,7 @@ QActor usercmdhandler context ctxRadar {
  		onEvent alarm : alarm( obstacle, p(D,A) ) -> switchToPlan handleAlarm;
 		//switchToPlan handleInput ;
 		repeatPlan
-     Plan handleStop resumeLastPlan
+	Plan handleStop resumeLastPlan
 		println("sei dentro handleStop") 
 		//TODO mandare lo stop al robot 
 	Plan handleStart resumeLastPlan
@@ -73,7 +73,7 @@ QActor sensorsonar context ctxSensorEmitter {
 		/* RULES */
 		sonar(s1,330).
 		sonar(s2,30).
-	//	sonar(s3,150).  
+		//sonar(s3,150).  
     	numOfSonars(N) :- bagof(sonar(S,P), sonar(S,P), SonarList), length(SonarList,N).
     	setmyposition :- numOfSonars(N), assert( numOfSonars( N ) ), mysonar( SONAR, _, _ ), sonar( SONAR,POS ), assert( position( POS ) ).   
     	//obstacledata( p(D,POS) ) :- actorOpDone( _,D ), position(POS). //actorOpDone( _,d(D) ) TODO trovare un modo per passare solo la distanza e non tutta la stringa generata
@@ -121,29 +121,29 @@ Robot ioRobot QActor robot_actor context ctxRobot /*-i*/{
 		println("startWalking2");
 		[!? tforward(T)] robotForward speed(100) time(T) react event obstacle -> stopWalking;
 		switchToPlan stopWalking
-   		
+
 	Plan stopWalking
 		println("stopWalking");
 		//printCurrentEvent;
 		robotStop speed(1) time(1);
 		println("ioRobot stopped");
 		switchToPlan waitRepositioning
-   	
-   	Plan reachedSensor
-   		println("reachedSensor");
+
+	Plan reachedSensor
+		println("reachedSensor");
 		robotStop speed(10) time(0);
-   		[!? tturnleft(T)] robotLeft speed(100) time (T); //girare a sinistra di 90°
-   		//TODO start blink led
+		[!? tturnleft(T)] robotLeft speed(100) time (T); //girare a sinistra di 90°
+		//TODO start blink led
 		actorOp startBlink;
 		delay time(2000);
 		//TODO fare una foto e mandarla alla console del radar (MQTT)
 		[!? tturnright(T)] robotRight speed(100) time (T); //girare a destra di 90°
-   		delay time(5000);
+		delay time(5000);
 		//TODO stop blink led
 		actorOp stopBlink;
 		delay time(2000);
 		//repeatPlan
-   		resumeLastPlan
+		resumeLastPlan
    	
 	Plan waitRepositioning
 		println("waitRepositioning");
@@ -175,6 +175,5 @@ Robot ioRobot QActor robot_actor context ctxRobot /*-i*/{
 		//[ !? tforward(X) ] robotForward speed(1000) time(X)  react event usercmd -> reactToUsercmd  or event sensordata -> reactToEvent;   
 		//[ !? tturn(X) ] robotLeft speed(1000) time(X)  react event usercmd -> reactToUsercmd  or event sensordata -> reactToEvent;     
 		//[ !? tforward(X) ] robotForward speed(1000) time(X)  react event usercmd -> reactToUsercmd; 
-   		println("doWork END ")
- 		              
+		println("doWork END ")
 }     
