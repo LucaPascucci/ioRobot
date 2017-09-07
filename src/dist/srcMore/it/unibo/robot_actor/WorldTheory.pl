@@ -136,8 +136,6 @@ actorPrintln( X ):- actorobj(A), text_term(XS,X), A  <- println( XS ).
 %-------------------------------------------------
 %  User static rules about robot_actor
 %------------------------------------------------- 
-tforward( 10000).
-tturn( 800).
 /*
 ------------------------------------------------------------------------
 testex :- actorPrintln( testex ),
