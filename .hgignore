@@ -1,6 +1,7 @@
 # Add any directories, files, or patterns you don't want to be tracked by version control
 syntax: glob
 .hgignore
+.project
 .gitignore
 .gradle/
 .settings/
@@ -12,4 +13,3 @@ srcMore
 sites
 configuration
 .classpath
-.project
