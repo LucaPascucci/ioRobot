@@ -3,16 +3,16 @@ package it.unibo.robot_actor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import it.unibo.bls.raspberry.components.DeviceLedPi4j;
+import it.unibo.bls.lowLevel.interfaces.ILed;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.system.SituatedActiveObject;
 
 public class BlinkAsynch extends SituatedActiveObject {
-	private DeviceLedPi4j led;
+	private ILed led;
 	private boolean goon = true;
 	private int blink_delay = 300;
 
-	public BlinkAsynch(String name, IOutputEnvView outEnvView, DeviceLedPi4j led) {
+	public BlinkAsynch(String name, IOutputEnvView outEnvView, ILed led) {
 		super(outEnvView, name);
 		this.led = led;
 	}

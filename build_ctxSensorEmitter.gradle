@@ -66,6 +66,12 @@ UNIBO SUPPORTS
 	  compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: '2p301.jar')
 	  compile fileTree(dir: '../it.unibo.iss.libs/libs/unibo', include: 'qa18Akka.jar')
 	  compile fileTree(dir: '../it.unibo.iss.libs/libs/http',  include: 'nanoHTTPD.jar')
+
+/*
+	RASPBERRY CAMERA
+*/	  
+	compile fileTree(dir: '/libs', include: 'jrpicam-1.1.1.jar')
+
 /*
 JSON
 */
