@@ -1,4 +1,5 @@
 package it.unibo.radargui;
+
 import it.unibo.is.interfaces.IOutputView;
 import it.unibo.qactors.QActorContext;
 import it.unibo.radar.gui.CtrlDashSwingImpl;
@@ -12,7 +13,6 @@ import it.unibo.radar.interfaces.IRadar;
 import it.unibo.radar.interfaces.IRadarView;
 import it.unibo.radar.interfaces.IRadarViewSwingImpl;
 import it.unibo.system.SituatedPlainObject;
- 
 
 public class RadarControl extends SituatedPlainObject {
 	protected IRadar radar;
@@ -20,34 +20,36 @@ public class RadarControl extends SituatedPlainObject {
 	protected IRadarViewSwingImpl ViewImpl;
 	protected GaugeDisplaySwingImpl gaugeDisplayImpl;
 	protected CtrlDashSwingImpl ctrlDashImpl;
- 
- 	
-	public RadarControl( QActorContext ctx, IOutputView outView ) throws Exception {
-		super( outView );
-    	initGauges();
+
+	public RadarControl(QActorContext ctx, IOutputView outView) throws Exception {
+		super(outView);
+		initGauges();
 		initDashBoard();
 	}
- 	protected void initGauges() {
+
+	protected void initGauges() {
 		ViewImpl = RadarViewSwingImpl.create("RadarView");
-		View 	 = RadarView.create(ViewImpl);
-		radar 	 = RadarWithView.create(View);
+		View = RadarView.create(ViewImpl);
+		radar = RadarWithView.create(View);
 	}
+
 	public void initDashBoard() {
-		gaugeDisplayImpl = GaugeDisplaySwingImpl.create("RadarDisplay",
-				ViewImpl);
+		gaugeDisplayImpl = GaugeDisplaySwingImpl.create("RadarDisplay", ViewImpl);
 		ctrlDashImpl = CtrlDashSwingImpl.create("Dashboard", gaugeDisplayImpl);
-		ctrlDashImpl.start(SonarRadarKb.winWith,SonarRadarKb.winWith);
+		ctrlDashImpl.start(SonarRadarKb.winWith, SonarRadarKb.winWith);
 	}
-	public void update( String dist, String theta ){		
+
+	public void update(String dist, String theta) {
 		try {
 			double distance = Double.parseDouble(dist);
-			double arg 		= Double.parseDouble(theta);
-			IPosition2D p0 	= Position2D.createPolar(distance,arg);
-//				outView.addOutput( "RadarControl UPDATE " + p0  );
-				if( radar == null ) return;
-				radar.update(p0);
+			double arg = Double.parseDouble(theta);
+			IPosition2D p0 = Position2D.createPolar(distance, arg);
+			// outView.addOutput( "RadarControl UPDATE " + p0 );
+			if (radar == null)
+				return;
+			radar.update(p0);
 		} catch (Exception e) {
- 			e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 }

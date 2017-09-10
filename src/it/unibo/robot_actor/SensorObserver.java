@@ -18,7 +18,6 @@ public class SensorObserver<T extends ISensorData> extends SituatedPlainObject i
 		this.actor = actor;
 	}
 
-	@Override
 	/*
 	 * SENSORDATA raw {"p":"b","t":"l","d":{"detection":0}},"tm":16124773}
 	 * {"p":"t","t":"m","d":{"raw3axes":{"x":308, "y":-649, "z":120}}}
@@ -26,6 +25,8 @@ public class SensorObserver<T extends ISensorData> extends SituatedPlainObject i
 	 * distance( VALUE, DIRECTION, POSITION )
 	 * magnetometer(x(VX),y(VY),z(VZ),POSITION)
 	 */
+
+	@Override
 	public void notify(T data) {
 		// println("SensorObserver: " + data.getClass().getName() );
 		// println("SensorObserver: " + data.getDefStringRep() );
@@ -37,21 +38,22 @@ public class SensorObserver<T extends ISensorData> extends SituatedPlainObject i
 	}
 
 	/*
-	 * ----------------------------------------------- DATA HANDLING APPLICATION
-	 * LOGIC -----------------------------------------------
+	 * DATA HANDLING APPLICATION LOGIC
 	 */
 	protected void handleData(T data) throws Exception {
 		// println("SensorObserver data=" + data.getDefStringRep() + " json:" +
 		// data.getJsonStringRep());
-		Struct t = (Struct) Term.createTerm(data.getDefStringRep());
 		// QActorUtils.raiseEvent(actor.getQActorContext(),"sensor",
 		// "sensordata", "sensordata("+data.getDefStringRep()+")" );
+
+		Struct t = (Struct) Term.createTerm(data.getDefStringRep());
+
 		if (t.getName().equals("distance")) {
 			int d = Integer.parseInt(t.getArg(0).toString());
 			if (d > 5 && d < 120) {
 				println("SensorObserver: " + data.getDefStringRep() + " json:" + data.getJsonStringRep());
 			}
-			if (d < 10) {
+			if (d < 5) {
 				QActorUtils.raiseEvent(actor.getQActorContext(), "sensor", "obstacle", "obstacle(" + d + ")");
 			}
 		}

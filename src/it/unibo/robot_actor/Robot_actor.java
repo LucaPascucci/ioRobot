@@ -45,11 +45,13 @@ public class Robot_actor extends AbstractRobot_actor {
 		try {
 			println("createPiCamera START");
 			this.piCamera = new RPiCamera("");
-			this.piCamera.setWidth(500).setHeight(500) // Set Camera width and height
+			this.piCamera.setWidth(500).setHeight(500) // Set Camera width and
+														// height
 					.setExposure(Exposure.AUTO) // Set Camera's exposure.
 					.setTimeout(2) // Set Camera's timeout.
 					.setAddRawBayer(true) // Add Raw Bayer data to image files
-					.setHorizontalFlipOn().setRotation(180);
+					.setHorizontalFlipOn() // Flip orizzontale automatico
+					.setRotation(180); // Rotazione immagine automatica
 
 			println("createPiCamera END");
 
@@ -62,12 +64,13 @@ public class Robot_actor extends AbstractRobot_actor {
 		BufferedImage image = null;
 		try {
 			println("ACQUISIZIONE FOTO IN CORSO...");
-			image = this.piCamera.takeBufferedStill(); // non salva la foto in locale (pi� veloce)
+			image = this.piCamera.takeBufferedStill(); // non salva la foto in
+														// locale (più veloce)
 			println("FOTO ACQUISITA");
-			
-			//TODO serve per salvare la foto in locale
-			//File outputfile = new File("/home/pi/Desktop/testphoto.jpg");
-			//ImageIO.write(image, "jpg", outputfile);
+
+			// per salvare la foto in locale (non ci serve)
+			// File outputfile = new File("/home/pi/Desktop/testphoto.jpg");
+			// ImageIO.write(image, "jpg", outputfile);
 
 		} catch (IOException | InterruptedException e) {
 			println("ERROR " + e.getMessage());
