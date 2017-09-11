@@ -2,11 +2,9 @@
 package it.unibo.robot_actor;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.util.Base64;
-
 import javax.imageio.ImageIO;
+import javax.xml.bind.DatatypeConverter;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 
@@ -23,9 +21,9 @@ import it.unibo.qactors.mqtt.MqttUtils;
 public class Robot_actor extends AbstractRobot_actor {
 	protected DeviceLedPi4j ledpi4j;
 	private MqttUtils mqtt = MqttUtils.getMqttSupport(this);
-//	private MqttClient client;
 	private BlinkAsynch blink;
 	protected RPiCamera piCamera;
+	private int counter = 1;
 
 	public Robot_actor(String actorId, QActorContext myCtx, IOutputEnvView outEnvView) throws Exception {
 		super(actorId, myCtx, outEnvView, it.unibo.qactors.QActorUtils.robotBase);
@@ -73,14 +71,8 @@ public class Robot_actor extends AbstractRobot_actor {
 		BufferedImage image = null;
 		try {
 			println("ACQUISIZIONE FOTO IN CORSO...");
-			image = this.piCamera.takeBufferedStill(); // non salva la foto in
-														// locale (pi√π veloce)
+			image = this.piCamera.takeBufferedStill(); 
 			println("FOTO ACQUISITA");
-
-			// per salvare la foto in locale (non ci serve)
-			// File outputfile = new File("/home/pi/Desktop/testphoto.jpg");
-			// ImageIO.write(image, "jpg", outputfile);
-
 		} catch (IOException | InterruptedException e) {
 			println("ERROR " + e.getMessage());
 		}
@@ -98,16 +90,13 @@ public class Robot_actor extends AbstractRobot_actor {
 		String clientId = "robotbagnoli";
 		String brokerAddr = "tcp://broker.hivemq.com:1883";
 		String topic = "unibo/mqtt/robotbagnoli";
-		BufferedImage bi;
+		BufferedImage bi = this.takePhoto();
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		try {
-			bi = ImageIO.read(new File("/home/pi/Pictures/testphoto.jpg"));
-			ImageIO.write(bi, ".jpg", os);
-			String messageBase64 =  Base64.getEncoder().encodeToString(os.toByteArray());
+			ImageIO.write(bi, "jpg", os);
+			String messageBase64 = DatatypeConverter.printBase64Binary(os.toByteArray());
 			os.close();
-			int i = 1;
-			println("LA FOTO TRASFORMATA IN STRINGA Ë QUESTA: " + messageBase64);
-			String messageToSend = "msg( photograph, dispatch, " +  this.getName() + ", " + this.getName().replace("_ctrl", "") + ", " + "messageBase64" + ", " + i++ + ")";
+			String messageToSend = "msg( photograph, dispatch, " +  this.getName() + ", " + this.getName().replace("_ctrl", "") + ", " + "ph(\"" + messageBase64 + "\")" + ", " + this.counter++ + ")";
 			this.mqtt.publish(this, clientId, brokerAddr, topic, messageToSend, 1, false);
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -11,7 +11,7 @@ Event alarm          : alarm( obstacle, p( Distance, Angle  ) )
 Event sonar 		 : p( Distance, Angle ) 
 Event numOfSonar  	 : numOfSonar( N )
 
-Dispatch photograph       : ph(X) 
+Dispatch photograph  : ph(X) 
 
 Context  ctxRadar      ip [ host="172.20.10.2" port=8033 ] -httpserver //192.168.137.1
 EventHandler evhr for sonar, alarm, cmd, numOfSonar ;
@@ -60,10 +60,10 @@ QActor photoreceiver context ctxRadar {
 		switchToPlan doWork 
 		
 	Plan doWork
-		println("Photoreceiver è entrato nella doWork") ;
 		receiveMsg time (86400000)  ; //one day
         printCurrentMessage ;
-        onMsg photograph : ph(X) -> actorOp saveMqttPhoto(X) ;  
+        onMsg photograph : ph(X) -> actorOp saveMqttPhoto(X) ; 
+        println('Foto Ricevuta') ; 
         repeatPlan  
 }
 
@@ -112,76 +112,45 @@ Robot ioRobot QActor robot_actor context ctxRobot /*-i*/{
 	
 	Plan init normal
 		actorOp connectToSend ;
-		actorOp createPi4jLed(23);
+		actorOp createPi4jLed(23) ;
+		actorOp createPiCamera ;
  		println("-------------");
  		println("ioRobot: A robot performs a move in reactive way (usercmd)"  )  ;
 		println("The moves can be stopped by pressing a button on the http GUI"  )  ;
 		println("-------------");
-		//switchToPlan reachedSensor;
 		switchToPlan startWalking;
   		println("---- FINE ----")
   		
-  	Plan startWalking
+  	Plan startWalking resumeLastPlan
    		println("startWalking");
    		//TODO aggiungere reazione a stop da console (usercmd)
    		[!? tforward(T)] robotForward speed(100) time(T) ; //react event obstacle -> stopWalking ; //or event alarm -> reachedSensor;
    		//switchToPlan waitRepositioning ;
-   		switchToPlan sendPhoto 
-   		//repeatPlan //ripete il plan all'infinito
-   	
-   	Plan sendPhoto resumeLastPlan
-   		println("sendPhoto") ;
-   		actorOp sendMsgMqtt
-   		//actorOp sendMqttPhoto ;  
-   	
-	Plan startWalking2
-		println("startWalking2");
-		[!? tforward(T)] robotForward speed(100) time(T) react event obstacle -> stopWalking;
-		switchToPlan stopWalking
+   		switchToPlan reachedSensor ;
+   		switchToPlan stopWalking
 
 	Plan stopWalking
 		println("stopWalking");
-		//printCurrentEvent;
 		robotStop speed(1) time(1);
 		println("ioRobot stopped");
 		switchToPlan waitRepositioning
 
-	Plan reachedSensor
+	Plan reachedSensor resumeLastPlan
 		println("reachedSensor");
 		robotStop speed(10) time(0);
 		[!? tturnleft(T)] robotLeft speed(100) time (T); //girare a sinistra di 90°
-		//TODO start blink led
 		actorOp startBlink;
 		delay time(2000);
-		//TODO fare una foto e mandarla alla console del radar (MQTT)
+		actorOp sendMsgMqtt ;
 		[!? tturnright(T)] robotRight speed(100) time (T); //girare a destra di 90°
 		delay time(5000);
-		//TODO stop blink led
 		actorOp stopBlink;
-		delay time(2000);
-		//repeatPlan
-		resumeLastPlan
+		delay time(2000)
    	
 	Plan waitRepositioning
 		println("waitRepositioning");
 		sense time(86400000) cmd -> continue;
-		println("Ho catturato l'evento start");
 		onEvent cmd : cmd(start) -> switchToPlan startWalking ;
 		repeatPlan
-    	             
-	Plan reactToUsercmd resumeLastPlan  
-		println("reactToUsercmd in robot_actor" ) 
 		        
-	Plan reactToEvent          
-		println("reactToEvent in robot_actor" ) ;   
-		printCurrentEvent ;     
-		[ ?? stored( Ev,line(X,POS) ) ] println ("stored( Ev,line(X,POS)");//println("---> line("+ X + "," + POS +") " );    
-		[ ?? stored( Ev,distance(X,POS,SIDE) ) ] println ("stored( Ev,distance(X,POS,SIDE)") //println("--->" + X)    
-	
-	Plan doWork
-		[ !? tforward(X) ] println("stored( Ev,distance(X,POS,SIDE)"); //println("r0 forward for " + X + " secs" );     
-		//[ !? tforward(X) ] robotForward speed(1000) time(X)  react event usercmd -> reactToUsercmd  or event sensordata -> reactToEvent;   
-		//[ !? tturn(X) ] robotLeft speed(1000) time(X)  react event usercmd -> reactToUsercmd  or event sensordata -> reactToEvent;     
-		//[ !? tforward(X) ] robotForward speed(1000) time(X)  react event usercmd -> reactToUsercmd; 
-		println("doWork END ")
 }     
