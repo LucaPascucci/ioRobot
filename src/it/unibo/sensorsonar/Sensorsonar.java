@@ -11,7 +11,6 @@ import it.unibo.qactors.QActorContext;
 
 public class Sensorsonar extends AbstractSensorsonar {
 	protected BufferedReader readerC;
-	protected String distance = "";
 	protected int counter = 1;
 
 	public Sensorsonar(String actorId, QActorContext myCtx, IOutputEnvView outEnvView) throws Exception {
@@ -31,16 +30,11 @@ public class Sensorsonar extends AbstractSensorsonar {
 
 	public void getDistanceFromSonar(int pos) {
 		try {
-			String inpS = readerC.readLine();
-			this.distance = "data( " + counter++ + ", distance, d(" + inpS + ") )";
+			String inpS = this.readerC.readLine();
 			println("getDistanceFromSonar " + inpS);
-			// int inpSInt = Integer.parseInt(inpS);
 			this.addRule("obstacledata(" + inpS + "," + pos + ")");
-			// return inpSInt;
 		} catch (Exception e) {
 			e.printStackTrace();
-			// return 0;
 		}
-
 	}
 }

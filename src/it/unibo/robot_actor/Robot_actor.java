@@ -24,6 +24,10 @@ public class Robot_actor extends AbstractRobot_actor {
 	private BlinkAsynch blink;
 	protected RPiCamera piCamera;
 	private int counter = 1;
+	
+	private String clientId = "ioRobotBNP";
+	private String brokerAddr = "tcp://broker.hivemq.com:1883";
+	private String topic = "unibo/mqtt/ioRobotBNP";
 
 	public Robot_actor(String actorId, QActorContext myCtx, IOutputEnvView outEnvView) throws Exception {
 		super(actorId, myCtx, outEnvView, it.unibo.qactors.QActorUtils.robotBase);
@@ -32,8 +36,8 @@ public class Robot_actor extends AbstractRobot_actor {
 	public void createPi4jLed(int pinNum) {
 		try {
 			println("Led createPi4jLed STARTS " + pinNum);
-			this.ledpi4j = new DeviceLedPi4j("led0", outEnvView, LedColor.RED, pinNum);
-			this.blink = new BlinkAsynch("blinker", outEnvView, ledpi4j);
+			this.ledpi4j = new DeviceLedPi4j("led0", this.outEnvView, LedColor.RED, pinNum);
+			this.blink = new BlinkAsynch("blinker", this.outEnvView, ledpi4j);
 
 		} catch (Exception e) {
 			println("ERROR " + e.getMessage());
@@ -52,14 +56,13 @@ public class Robot_actor extends AbstractRobot_actor {
 		try {
 			println("createPiCamera START");
 			this.piCamera = new RPiCamera("");
-			this.piCamera.setWidth(500).setHeight(500) // Set Camera width and
-														// height
+			this.piCamera.setWidth(500).setHeight(500) // Set Camera width and height
 					.setExposure(Exposure.AUTO) // Set Camera's exposure.
 					.setTimeout(2) // Set Camera's timeout.
 					.setAddRawBayer(true) // Add Raw Bayer data to image files
 					.setHorizontalFlipOn() // Flip orizzontale automatico
 					.setRotation(180); // Rotazione immagine automatica
-
+			
 			println("createPiCamera END");
 
 		} catch (FailedToRunRaspistillException e) {
@@ -80,24 +83,18 @@ public class Robot_actor extends AbstractRobot_actor {
 	}
 
 	public void connectToSend() throws MqttException {
-		String clientId = "robotbagnoli";
-		String brokerAddr = "tcp://broker.hivemq.com:1883";
-		String topic = "unibo/mqtt/robotbagnoli";
-		this.mqtt.connect(this, clientId, brokerAddr, topic);
+		this.mqtt.connect(this, this.clientId, this.brokerAddr, this.topic);
 	}
 
 	public void sendMsgMqtt() {
-		String clientId = "robotbagnoli";
-		String brokerAddr = "tcp://broker.hivemq.com:1883";
-		String topic = "unibo/mqtt/robotbagnoli";
-		BufferedImage bi = this.takePhoto();
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		try {
+			BufferedImage bi = this.takePhoto();
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			ImageIO.write(bi, "jpg", os);
 			String messageBase64 = DatatypeConverter.printBase64Binary(os.toByteArray());
 			os.close();
 			String messageToSend = "msg( photograph, dispatch, " +  this.getName() + ", " + this.getName().replace("_ctrl", "") + ", " + "ph(\"" + messageBase64 + "\")" + ", " + this.counter++ + ")";
-			this.mqtt.publish(this, clientId, brokerAddr, topic, messageToSend, 1, false);
+			this.mqtt.publish(this, this.clientId, this.brokerAddr, this.topic, messageToSend, 1, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

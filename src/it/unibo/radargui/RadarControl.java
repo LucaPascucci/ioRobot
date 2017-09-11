@@ -28,15 +28,15 @@ public class RadarControl extends SituatedPlainObject {
 	}
 
 	protected void initGauges() {
-		ViewImpl = RadarViewSwingImpl.create("RadarView");
-		View = RadarView.create(ViewImpl);
-		radar = RadarWithView.create(View);
+		this.ViewImpl = RadarViewSwingImpl.create("RadarView");
+		this.View = RadarView.create(this.ViewImpl);
+		this.radar = RadarWithView.create(this.View);
 	}
 
 	public void initDashBoard() {
-		gaugeDisplayImpl = GaugeDisplaySwingImpl.create("RadarDisplay", ViewImpl);
-		ctrlDashImpl = CtrlDashSwingImpl.create("Dashboard", gaugeDisplayImpl);
-		ctrlDashImpl.start(SonarRadarKb.winWith, SonarRadarKb.winWith);
+		this.gaugeDisplayImpl = GaugeDisplaySwingImpl.create("RadarDisplay", this.ViewImpl);
+		this.ctrlDashImpl = CtrlDashSwingImpl.create("Dashboard", this.gaugeDisplayImpl);
+		this.ctrlDashImpl.start(SonarRadarKb.winWith, SonarRadarKb.winWith);
 	}
 
 	public void update(String dist, String theta) {
@@ -44,10 +44,10 @@ public class RadarControl extends SituatedPlainObject {
 			double distance = Double.parseDouble(dist);
 			double arg = Double.parseDouble(theta);
 			IPosition2D p0 = Position2D.createPolar(distance, arg);
-			// outView.addOutput( "RadarControl UPDATE " + p0 );
-			if (radar == null)
+			if (this.radar == null){
 				return;
-			radar.update(p0);
+			}
+			this.radar.update(p0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -24,30 +24,30 @@ public class BlinkAsynch extends SituatedActiveObject {
 	}
 
 	public void suspendWork() {
-		goon = false;
+		this.goon = false;
 	}
 
 	@Override
 	protected void startWork() throws Exception {
-		goon = true;
+		this.goon = true;
 	}
 
 	@Override
 	protected void doJob() throws Exception {
-		while (goon) {
-			led.turnOn();
+		while (this.goon) {
+			this.led.turnOn();
 			delay(this.blink_delay);
-			if (!goon) {
+			if (!this.goon) {
 				break;
 			}
-			led.turnOff();
+			this.led.turnOff();
 			delay(this.blink_delay);
 		}
 	}
 
 	@Override
 	protected void endWork() throws Exception {
-		led.turnOff();
+		this.led.turnOff();
 	}
 
 	protected static void delay(int n) {

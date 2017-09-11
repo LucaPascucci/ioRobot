@@ -17,27 +17,28 @@ import it.unibo.qactors.mqtt.MqttUtils;
 public class Photoreceiver extends AbstractPhotoreceiver {
 	private MqttUtils mqtt = MqttUtils.getMqttSupport(this);
 	private int counter = 1;
+	private String clientid = "photoReceiverBNP";
+	private String brokerAddr = "tcp://broker.hivemq.com:1883";
+	private String topic = "unibo/mqtt/ioRobotBNP";
+	private String defaultFileName = "ioRobotPhoto";
+	private String defaultImageFormat = "jpg";
 	
 	public Photoreceiver(String actorId, QActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
 		super(actorId, myCtx, outEnvView);
 	}
 	
 	public void connectAndSubscribe() throws Exception {
-		String clientid = "photoreceiver";
-		String brokerAddr = "tcp://broker.hivemq.com:1883";
-		String topic = "unibo/mqtt/robotbagnoli";
-		this.mqtt.connect(this, clientid, brokerAddr, topic);
-		this.mqtt.subscribe(this, clientid, brokerAddr, topic);
+		this.mqtt.connect(this, this.clientid, this.brokerAddr, this.topic);
+		this.mqtt.subscribe(this, this.clientid, this.brokerAddr, this.topic);
 	}
 	
 	public void saveMqttPhoto(String photo) {
-		ByteArrayInputStream bis = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(photo));
-		BufferedImage image;
 		try {
-			image = ImageIO.read(bis);
+			ByteArrayInputStream bis = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(photo));
+			BufferedImage image = ImageIO.read(bis);
 			bis.close();
-			File outputfile = new File("ioRobotPhoto" + this.counter + ".jpg");
-			ImageIO.write(image, "jpg", outputfile);
+			File outputfile = new File(this.defaultFileName + this.counter + "." + this.defaultImageFormat);
+			ImageIO.write(image, this.defaultImageFormat, outputfile);
 			this.counter++;
 		} catch (IOException e) {
 			e.printStackTrace();

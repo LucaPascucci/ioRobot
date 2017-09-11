@@ -28,8 +28,6 @@ public class SensorObserver<T extends ISensorData> extends SituatedPlainObject i
 
 	@Override
 	public void notify(T data) {
-		// println("SensorObserver: " + data.getClass().getName() );
-		// println("SensorObserver: " + data.getDefStringRep() );
 		try {
 			handleData(data);
 		} catch (Exception e) {
@@ -41,8 +39,6 @@ public class SensorObserver<T extends ISensorData> extends SituatedPlainObject i
 	 * DATA HANDLING APPLICATION LOGIC
 	 */
 	protected void handleData(T data) throws Exception {
-		// println("SensorObserver data=" + data.getDefStringRep() + " json:" +
-		// data.getJsonStringRep());
 		// QActorUtils.raiseEvent(actor.getQActorContext(),"sensor",
 		// "sensordata", "sensordata("+data.getDefStringRep()+")" );
 
@@ -54,7 +50,7 @@ public class SensorObserver<T extends ISensorData> extends SituatedPlainObject i
 				println("SensorObserver: " + data.getDefStringRep() + " json:" + data.getJsonStringRep());
 			}
 			if (d < 5) {
-				QActorUtils.raiseEvent(actor.getQActorContext(), "sensor", "obstacle", "obstacle(" + d + ")");
+				QActorUtils.raiseEvent(this.actor.getQActorContext(), "sensor", "obstacle", "obstacle(" + d + ")");
 			}
 		}
 	}
@@ -69,7 +65,7 @@ public class SensorObserver<T extends ISensorData> extends SituatedPlainObject i
 	protected void handleDataViaProlog(T data) {
 		try {
 			String goal = "sensor( DATA )".replace("DATA", data.getDefStringRep());
-			QActorUtils.solveGoal(actor.getPrologEngine(), goal);
+			QActorUtils.solveGoal(this.actor.getPrologEngine(), goal);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

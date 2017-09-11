@@ -16,21 +16,12 @@ public class Radargui extends AbstractRadargui {
 
 	public boolean activateGui() throws Exception {
 		println(this.getName() + " activateGui ");
-		radarControl = new RadarControl(myCtx, outEnvView);
+		this.radarControl = new RadarControl(this.myCtx, this.outEnvView);
 		return true;
 	}
 
 	public void sendDataToGui(int distance, int angle) {
 		println("sendDataToGui: " + distance + " " + angle);
-		// String first = distance.replaceAll("[^0-9]+", " ");
-		// List<String> lista = Arrays.asList(first.trim().split(" "));
-		radarControl.update(Integer.toString(distance), Integer.toString(angle));
+		this.radarControl.update(Integer.toString(distance), Integer.toString(angle));
 	}
-
-	// public void connectAndSubscribe(String clientid, String brokerAddr,
-	// String topic) throws Exception{
-	// println(this.getName() + " connectAndSubscribe " );
-	// this.mqtt.connect(this, clientid, brokerAddr, topic);
-	// this.mqtt.subscribe(this, clientid, brokerAddr, topic);
-	// }
 }
