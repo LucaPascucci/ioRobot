@@ -1,11 +1,9 @@
 RobotSystem robotSystem
                         
 Event cmd : cmd(X)  //per lo start e per lo stop da console (pagina 23 del pdf per spiegazione)
-Event sensordata : sensordata(X)  //from SensorObserver
 Event reachedsensor : reachedsensor(X) 
 Event obstacle : obstacle(X) //from red button (obstacle from console) and from SensorObserver       
 
-Event inputcmd       : usercmd(executeInput(CMD)) //per il run da console
 Event alarm          : alarm( obstacle, p( Distance, Angle  ) )
 Event sonar 		 : p( Distance, Angle ) 
 Event numOfSonar  	 : numOfSonar( N )
@@ -13,12 +11,13 @@ Event numOfSonar  	 : numOfSonar( N )
 Dispatch photograph  : ph(X) 
 
 Context  ctxRadar      ip [ host="172.20.10.2" port=8033 ] -httpserver //192.168.137.1
-EventHandler evhr for sonar, alarm, cmd, numOfSonar ;
+EventHandler evhr for sonar, alarm, cmd, numOfSonar;
+
 Context  ctxSensorEmitter  ip [ host="172.20.10.3" port=8133 ] //Primo sonar del muro
 //Context  ctxSensorEmitter  ip [ host="172.20.10.14" port=8133 ] //Secondo sonar del muro
 
 Context ctxRobot ip [ host="172.20.10.14"  port=8079 ]
-EventHandler evh for alarm, obstacle, sensordata, cmd { memo currentEvent for robot_actor };
+EventHandler evh for alarm, obstacle, cmd { memo currentEvent for robot_actor };
 
 QActor radargui context ctxRadar {
 	  	
