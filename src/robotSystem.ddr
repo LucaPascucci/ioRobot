@@ -135,6 +135,24 @@ QActor sensorsonar context ctxSensorEmitter {
 		switchTo workReal
 }
 
+QActor robotsonar context ctxRobot {
+	  
+	Rules {}
+
+	Plan init normal
+		actions[
+			println("robotsonar STARTS") ;
+    		actorOp startSonarC
+    	]
+		switchTo workReal
+    	 
+	Plan workReal 
+		actions[
+			actorOp getDistanceFromSonar
+		]
+		switchTo workReal
+}
+
 Robot ioRobot QActor robot_actor context ctxRobot {
             
 	Rules {           
@@ -201,4 +219,4 @@ Robot ioRobot QActor robot_actor context ctxRobot {
     	actions [
     		println("timeout")
     	]
-}    
+}

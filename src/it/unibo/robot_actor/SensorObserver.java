@@ -47,10 +47,10 @@ public class SensorObserver<T extends ISensorData> extends SituatedPlainObject i
 		if (t.getName().equals("distance")) {
 			int d = Integer.parseInt(t.getArg(0).toString());
 			if (d > 5 && d < 120) {
-				println("SensorObserver: " + data.getDefStringRep() + " json:" + data.getJsonStringRep());
+				//println("SensorObserver: " + data.getDefStringRep() + " json:" + data.getJsonStringRep());
 			}
 			if (d < 5) {
-				QActorUtils.raiseEvent(this.actor.getQActorContext(), "sensor", "obstacle", "obstacle(" + d + ")");
+				//QActorUtils.raiseEvent(this.actor.getQActorContext(), "sensor", "obstacle", "obstacle(" + d + ")");
 			}
 		}
 	}
