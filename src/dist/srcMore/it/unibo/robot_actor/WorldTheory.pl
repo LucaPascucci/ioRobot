@@ -37,6 +37,11 @@ newName( Prot, Name,N1 ) :-
 	text_term(ProtS,Prot),
  	text_concat(ProtS,N1S,Name),
 	replaceRule( instance( _, _, _ ), instance( Prot, N1, Name ) ).
+newInstance( Prot, Name, P ) :-
+ 	text_term(N1S,P), 
+	text_term(ProtS,Prot),
+ 	text_concat(ProtS,N1S,Name),
+	replaceRule( instance( _, _, _ ), instance( Prot, P, Name ) ).
 
 %%setPrologResult( timeOut(T) ):- setTimeOut( tout("prolog", tout(T))  ).
 
@@ -468,6 +473,7 @@ fibo(1,1).
 fibo(2,1).
 fibo(3,2).
 fibo(4,3).
+fibo(I,N) :- I < 5, !, fail.	%%%JULY2017, if N bound
 fibo(I,N) :- V1 is I-1, V2 is I-2,
   fibo(V1,N1), fibo(V2,N2),
   N is N1 + N2.
@@ -490,6 +496,7 @@ fibmemo( 2,1 ).
 fibmemo( 3,2 ).
 fibWithCache( V,N ) :-
 	fibmemo( V,N ),!.
+fibWithCache( V,N ) :- V < 4, !, fail. %%%JULY2017, if N bound
 fibWithCache( V,N ) :-
 	V1 is V-1, V2 is V-2,
   	fibWithCache(V1,N1), fibWithCache(V2,N2),
@@ -505,4 +512,4 @@ initialize  :-
 	actorobj(Actor),
  	output( worlTheoryLoaded(Actor) ).
  
-:- initialization(initialize).
+%% :- initialization(initialize).

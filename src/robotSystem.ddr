@@ -20,50 +20,80 @@ Context  ctxSensorEmitter  ip [ host="172.20.10.3" port=8133 ] //Primo sonar del
 Context ctxRobot ip [ host="172.20.10.14"  port=8079 ]
 EventHandler evh for alarm, obstacle, sensordata, cmd { memo currentEvent for robot_actor };
 
-QActor  radargui context ctxRadar {
+QActor radargui context ctxRadar {
 	  	
 	Rules {
 		checknear( D,A ) :- eval( lt, D, 20 ), !, assert( obstacle(D,A) ). //TODO sostituire 20 con 40
 		checknear( D,A ).
 	}
 	  
-	Plan init normal         
-		println("RADAR init the GUI ... ") ;     
-		actorOp activateGui ;     
-		switchToPlan doWorkMsgs      
+	Plan init normal  
+		actions[
+			println("RADAR init the GUI ... ") ;	
+			actorOp activateGui
+		]        
+		switchTo doWorkMsgs     
+	
 	Plan doWorkMsgs 
-		sense time(86400000) sonar -> continue ;
-		switchToPlan checkObstacle ;
-		onEvent sonar : p(D,A) -> actorOp sendDataToGui( D,A ) ; 
-		repeatPlan  
-	Plan checkObstacle resumeLastPlan
-		onEvent sonar : p(D,A) -> demo checknear(D,A) ;
-		[ ?? obstacle(D,A)  ] emit reachedsensor : reachedsensor(X) //il robot ha raggiunto il sensore, emetto un evento per avvisarlo
+		actions[
+			println("doWorkMsgs")
+		]
+		transition 
+		whenTime 86400000 -> doWorkMsgs
+		whenEvent sonar -> checkObstacle
+		
+	Plan checkObstacle
+		actions[
+			println("checkObstacle") ;
+			onEvent sonar : p(D,A) -> actorOp sendDataToGui( D,A ) ;
+			onEvent sonar : p(D,A) -> demo checknear(D,A) ;
+			[ ?? obstacle(D,A)  ] emit reachedsensor : reachedsensor(X)  //il robot ha raggiunto il sensore, emetto un evento per avvisarlo	 
+		]  
+		switchTo doWorkMsgs
+	
 }
 
 QActor alarmhandler context ctxRadar {
 	
-	Plan init normal        
-		sense time(86400000) alarm -> continue;
- 		onEvent alarm : alarm( obstacle, p(D,A) ) -> switchToPlan handleAlarm; //TODO questo evento deve essere emesso dove valuto l'espressione
-		repeatPlan
+	Plan init normal
+		actions[
+			println("init alarmhandler")
+		]   
+		transition
+		whenTime 86400000 -> init
+		whenEvent alarm -> handleAlarm //TODO questo evento deve essere emesso dove valuto l'espressione
+		
 	Plan handleAlarm resumeLastPlan
-		println("alarm") ;
-		sound time(2000) file('./audio/tada2.wav') 
+		actions[
+			println("alarm") ;
+			sound time(2000) file('./audio/tada2.wav')	
+		] 
+		switchTo init
 }
 
 QActor photoreceiver context ctxRadar {
 	
 	Plan init normal
-        actorOp connectAndSubscribe ;
-		switchToPlan doWork 
+		actions[
+			actorOp connectAndSubscribe
+		] 
+		switchTo doWork
 		
 	Plan doWork
-		receiveMsg time (86400000)  ; //one day
-        printCurrentMessage ;
-        onMsg photograph : ph(X) -> actorOp saveMqttPhoto(X) ; 
-        println('Foto Ricevuta') ; 
-        repeatPlan  
+		actions[
+			println("doWork")
+		]
+		transition 
+		whenTime 86400000 -> doWork
+		whenMsg photograph -> savePhoto  
+        
+	Plan savePhoto
+		actions[
+			printCurrentMessage ;
+			onMsg photograph : ph(X) -> actorOp saveMqttPhoto(X) ; 
+        	println('Foto Ricevuta')  
+		]
+		switchTo doWork
 }
 
 QActor sensorsonar context ctxSensorEmitter {
@@ -71,7 +101,6 @@ QActor sensorsonar context ctxSensorEmitter {
 	Rules {
 		/* THESE RULES ARE WRITTEN IN THE WorldTheory of the sensorsonar */
 		/* CONFIGURATION */
-		onRaspberry.
 		mysonar( s1, coloryellow, "172.20.10.12" ).
 		//mysonar( s2, colorred, "172.20.10.14" ).   
 		
@@ -87,69 +116,89 @@ QActor sensorsonar context ctxSensorEmitter {
     	//obstacledata( p(D,POS) ) :- actorOpDone( _,D ), position(POS). //actorOpDone( _,d(D) ) TODO trovare un modo per passare solo la distanza e non tutta la stringa generata
 	}
 
-	Plan init normal     
-		println("sensorsonar STARTS")  ;
-    	[ !? onRaspberry ] actorOp startSonarC;
-    	demo setmyposition ;  //depends on mysonar
-    	[ !? position(POS) ] println( position(POS) );
-    	[ !? numOfSonars(N) ]  println( numOfSonars(N) );
- 		[ !? numOfSonars(N) ]  emit numOfSonar : numOfSonar(N) ;
-    	[ !? onRaspberry ] switchToPlan workReal 
+	Plan init normal
+		actions[
+			println("sensorsonar STARTS")  ;
+    		actorOp startSonarC ;	
+    		demo setmyposition ;
+    		[ !? position(POS) ] println( position(POS) ) ;
+    		[ !? numOfSonars(N) ]  println( numOfSonars(N) ) ;
+ 			[ !? numOfSonars(N) ]  emit numOfSonar : numOfSonar(N) 
+		]
+		switchTo workReal
+    	 
 	Plan workReal 
-		[ !? position(POS) ] actorOp getDistanceFromSonar(POS) ; //(1)  //Dati reali prelevati dal sensore
-		[ ?? obstacledata( D,POS )] emit sonar : p(D,POS) ;
-    	repeatPlan
+		actions[
+			[ !? position(POS) ] actorOp getDistanceFromSonar(POS) ; //(1)  //Dati reali prelevati dal sensore
+			[ ?? obstacledata( D,POS )] emit sonar : p(D,POS)
+		]
+		switchTo workReal
 }
 
-Robot ioRobot QActor robot_actor context ctxRobot /*-i*/{
-	          
+Robot ioRobot QActor robot_actor context ctxRobot {
+            
 	Rules {           
 		tforward(10000).
 		tturnright(350).
-		tturnleft(300).
-	}
+	    tturnleft(300).
+	 }
+	  
+	 Plan init normal 
+		actions [
+	    	actorOp connectToSend;
+	      	actorOp createPi4jLed(23) ;
+	      	actorOp createPiCamera ;
+	      	println("-------------");
+	      	println("ioRobot: A robot performs a move in reactive way"  );
+	      	println("-------------")
+	    ]
+	    switchTo startWalking
+	    
+	Plan startWalking //resumeLastPlan
+		actions [
+	    	println("startWalking")
+		]
+	    reactive [!? tforward(T)] robotForward speed(60) time(T)
+	    whenEnd          	  		  -> startWalking
+	    whenTout 12000        		  -> handleTout
+	    whenEvent obstacle    		  -> stopWalking
+	    or whenEvent reachedsensor    -> reachedSensor
+	    or whenEvent cmd    		  -> stopWalking
+	    or whenEvent alarm 			  -> stopWalking
 	
-	Plan init normal
-		actorOp connectToSend ;
-		actorOp createPi4jLed(23) ;
-		actorOp createPiCamera ;
- 		println("-------------");
- 		println("ioRobot: A robot performs a move in reactive way (usercmd)"  )  ;
-		println("The moves can be stopped by pressing a button on the http GUI"  )  ;
-		println("-------------");
-		switchToPlan startWalking;
-  		println("---- FINE ----")
-  		
-  	Plan startWalking resumeLastPlan
-   		println("startWalking");
-   		//TODO aggiungere reazione a stop da console (usercmd)
-   		[!? tforward(T)] robotForward speed(100) time(T) ; //react event obstacle -> stopWalking ; //or event alarm -> reachedSensor;
-   		//switchToPlan waitRepositioning ;
-   		switchToPlan reachedSensor ;
-   		switchToPlan stopWalking
-
 	Plan stopWalking
-		println("stopWalking");
-		robotStop speed(1) time(1);
-		println("ioRobot stopped");
-		switchToPlan waitRepositioning
-
-	Plan reachedSensor resumeLastPlan
-		println("reachedSensor");
-		robotStop speed(10) time(0);
-		[!? tturnleft(T)] robotLeft speed(100) time (T); //girare a sinistra di 90°
-		actorOp startBlink;
-		delay time(2000);
-		actorOp sendMsgMqtt ;
-		[!? tturnright(T)] robotRight speed(100) time (T); //girare a destra di 90°
-		delay time(5000);
-		actorOp stopBlink;
-		delay time(2000)
-   	
+		actions [
+	    	println("stopWalking");
+	    	robotStop speed(1) time(1);
+	    	println("ioRobot stopped")
+	    ]
+	    switchTo waitRepositioning
+	
+	Plan reachedSensor
+		actions [
+	    	println("reachedSensor");
+	      	robotStop speed(10) time(0);
+	      	[!? tturnleft(T)] robotLeft speed(60) time (T); //girare a sinistra di 90°
+	      	delay time(2000);
+	      	actorOp startBlink;
+	      	actorOp sendMsgMqtt ;
+	      	delay time(2000);
+	      	[!? tturnright(T)] robotRight speed(60) time (T); //girare a destra di 90°
+	      	delay time(2000);
+	      	actorOp stopBlink
+	    ] 
+	    switchTo startWalking
+	     
 	Plan waitRepositioning
-		println("waitRepositioning");
-		sense time(86400000) cmd -> continue;
-		onEvent cmd : cmd(start) -> switchToPlan startWalking ;
-		repeatPlan
-		        
-}     
+		actions [
+	    	println("waitRepositioning")
+	    ]
+	    transition
+	    whenTime 86400000 -> waitRepositioning
+	    whenEvent cmd -> startWalking // per l'evento start ricevuto da console
+    
+    Plan handleTout
+    	actions [
+    		println("timeout")
+    	]
+}    
