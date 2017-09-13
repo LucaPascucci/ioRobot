@@ -32,7 +32,7 @@ public class Robotsonar extends AbstractRobotsonar {
 			String strDistance = this.readerC.readLine();
 			int distance = Integer.parseInt(strDistance);
 			println("RobotSonar " + distance);
-			if (distance < 5) {
+			if (distance < 10) {
 				QActorUtils.raiseEvent(this.getQActorContext(), "sensor", "obstacle", "obstacle(" + distance + ")");
 			}
 		} catch (Exception e) {

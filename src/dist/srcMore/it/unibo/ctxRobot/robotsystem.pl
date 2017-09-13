@@ -13,8 +13,10 @@ qactor( photoreceiver , ctxradar, "it.unibo.photoreceiver.MsgHandle_Photoreceive
 qactor( photoreceiver_ctrl , ctxradar, "it.unibo.photoreceiver.Photoreceiver"   ). %%control-driven 
 qactor( sensorsonar , ctxsensoremitter, "it.unibo.sensorsonar.MsgHandle_Sensorsonar"   ). %%store msgs 
 qactor( sensorsonar_ctrl , ctxsensoremitter, "it.unibo.sensorsonar.Sensorsonar"   ). %%control-driven 
+qactor( robotsonar , ctxrobot, "it.unibo.robotsonar.MsgHandle_Robotsonar"   ). %%store msgs 
+qactor( robotsonar_ctrl , ctxrobot, "it.unibo.robotsonar.Robotsonar"   ). %%control-driven 
 %%% -------------------------------------------
-eventhandler(evh,ctxrobot,"it.unibo.ctxRobot.Evh","alarm,obstacle,sensordata,cmd").  
+eventhandler(evh,ctxrobot,"it.unibo.ctxRobot.Evh","alarm,cmd").  
 %%% -------------------------------------------
 qactor( robot_actor , ctxrobot, "it.unibo.robot_actor.MsgHandle_Robot_actor" ). 
 qactor( robot_actor_ctrl , ctxrobot, "it.unibo.robot_actor.Robot_actor" ). 
