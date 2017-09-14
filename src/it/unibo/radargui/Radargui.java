@@ -35,6 +35,7 @@ public class Radargui extends AbstractRadargui {
 	}
 	
 	public void reset() {
+		println("SONO NEL RESET");
 		this.sensorsData.clear();
 		this.sensorToReach = 1;
 	}
@@ -47,7 +48,8 @@ public class Radargui extends AbstractRadargui {
 			this.sensorToReach = 2;
 		} else if (this.sensorsData.get(30) < DMIN_SONAR && this.sensorToReach == 2) {
 			QActorUtils.raiseEvent(this.getQActorContext(), "radargui", "reachedsensor", "reachedsensor(" + this.sensorToReach + ")");
-		} else if (this.sensorsData.size() == 2) {
+			this.sensorToReach = -1;
+		} else if (this.sensorsData.size() == 2 && sensorToReach == 1) {
 			int numerator = this.sensorsData.values().stream().mapToInt(Number::intValue).sum();
 			int denominator = NUM_OF_SONARS - this.sensorToReach + 1;
 			int valueOfExpression = numerator / denominator;
