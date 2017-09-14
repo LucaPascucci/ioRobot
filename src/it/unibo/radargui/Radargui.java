@@ -34,6 +34,11 @@ public class Radargui extends AbstractRadargui {
 		this.radarControl.update(Integer.toString(distance), Integer.toString(angle));
 	}
 	
+	public void reset() {
+		this.sensorsData.clear();
+		this.sensorToReach = 1;
+	}
+	
 	public void checkSonars(int distance, int angle) throws Exception {
 		this.sensorsData.put(angle, distance);
 		if (this.sensorsData.size() == 2) {

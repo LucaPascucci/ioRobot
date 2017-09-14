@@ -5,13 +5,14 @@ This code is generated only ONCE
 package it.unibo.sensorsonar;
 
 import java.io.BufferedReader;
-
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.qactors.QActorContext;
 
 public class Sensorsonar extends AbstractSensorsonar {
 	protected BufferedReader readerC;
 	protected int counter = 1;
+//	private int[] sensorData = new int[5];
+//	private int i = 0;
 
 	public Sensorsonar(String actorId, QActorContext myCtx, IOutputEnvView outEnvView) throws Exception {
 		super(actorId, myCtx, outEnvView);
@@ -33,6 +34,17 @@ public class Sensorsonar extends AbstractSensorsonar {
 			String inpS = this.readerC.readLine();
 			println("getDistanceFromSonar " + inpS);
 			this.addRule("obstacledata(" + inpS + "," + pos + ")");
+//			this.sensorData[this.i % 5] = Integer.parseInt(inpS);
+//			this.i++;
+//			if (this.i >= 5) {
+//				int sum = 0;
+//				for (int k : this.sensorData) {
+//					sum += k;
+//				}
+//				int average = sum / 5;
+//				println("getDistanceFromSonar " + average);
+//				this.addRule("obstacledata(" + average + "," + pos + ")");
+//			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
