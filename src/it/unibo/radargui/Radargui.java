@@ -41,19 +41,18 @@ public class Radargui extends AbstractRadargui {
 	
 	public void checkSonars(int distance, int angle) throws Exception {
 		this.sensorsData.put(angle, distance);
-		if (this.sensorsData.size() == 2) {
+		
+		if (this.sensorsData.get(330) <= DMIN_SONAR && this.sensorToReach == 1 ) {
+			QActorUtils.raiseEvent(this.getQActorContext(), "radargui", "reachedsensor", "reachedsensor(" + this.sensorToReach + ")");
+			this.sensorToReach = 2;
+		} else if (this.sensorsData.get(30) < DMIN_SONAR && this.sensorToReach == 2) {
+			QActorUtils.raiseEvent(this.getQActorContext(), "radargui", "reachedsensor", "reachedsensor(" + this.sensorToReach + ")");
+		} else if (this.sensorsData.size() == 2) {
 			int numerator = this.sensorsData.values().stream().mapToInt(Number::intValue).sum();
 			int denominator = NUM_OF_SONARS - this.sensorToReach + 1;
 			int valueOfExpression = numerator / denominator;
 			if (valueOfExpression < DMIN_EXPRESSION) {
-				if (this.sensorsData.get(330) < DMIN_SONAR && this.sensorToReach == 1) {
-					QActorUtils.raiseEvent(this.getQActorContext(), "radargui", "reachedsensor", "reachedsensor(" + this.sensorToReach + ")");
-					this.sensorToReach = 2;
-				} else if (this.sensorsData.get(30) < 40 && this.sensorToReach == 2) {
-					QActorUtils.raiseEvent(this.getQActorContext(), "radargui", "reachedsensor", "reachedsensor(" + this.sensorToReach + ")");
-				} else {
-					QActorUtils.raiseEvent(this.getQActorContext(), "radargui", "alarm", "alarm(" + valueOfExpression + ")");
-				}
+				QActorUtils.raiseEvent(this.getQActorContext(), "radargui", "alarm", "alarm(" + valueOfExpression + ")");
 			}
 		}
 	}
