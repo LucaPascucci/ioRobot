@@ -18,7 +18,7 @@ public class Photoreceiver extends AbstractPhotoreceiver {
 	private MqttUtils mqtt = MqttUtils.getMqttSupport(this);
 	private int counter = 1;
 	private String clientid = "photoReceiverBNP";
-	private String brokerAddr = "tcp://broker.hivemq.com:1883";
+	private String brokerAddr = "tcp://test.mosquitto.org:1883";
 	private String topic = "unibo/mqtt/ioRobotBNP";
 	private String defaultFileName = "ioRobotPhoto";
 	private String defaultImageFormat = "jpg";

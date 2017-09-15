@@ -26,17 +26,17 @@ public class Robot_actor extends AbstractRobot_actor {
 	private int counter = 1;
 	
 	private String clientId = "ioRobotBNP";
-	private String brokerAddr = "tcp://broker.hivemq.com:1883";
+	private String brokerAddr = "tcp://test.mosquitto.org:1883";
 	private String topic = "unibo/mqtt/ioRobotBNP";
 
 	public Robot_actor(String actorId, QActorContext myCtx, IOutputEnvView outEnvView) throws Exception {
 		super(actorId, myCtx, outEnvView, it.unibo.qactors.QActorUtils.robotBase);
 	}
 
-	public void createPi4jLed(int pinNum) {
+	public void createPi4jLed() {
 		try {
-			println("Led createPi4jLed STARTS " + pinNum);
-			this.ledpi4j = new DeviceLedPi4j("led0", this.outEnvView, LedColor.RED, pinNum);
+			println("Led createPi4jLed STARTS ");
+			this.ledpi4j = new DeviceLedPi4j("led0", this.outEnvView, LedColor.RED, 23);
 			this.blink = new BlinkAsynch("blinker", this.outEnvView, ledpi4j);
 
 		} catch (Exception e) {

@@ -2,7 +2,8 @@ RobotSystem robotSystem
                         
 Event cmd 			 : cmd(X)  //per lo start e per lo stop da console
 Event reachedsensor  : reachedsensor(X) 
-Event obstacle 		 : obstacle(X) //emesso dal java 
+Event obstacle 		 : obstacle(X)
+Event usercmd 		 : usercmd(robotgui(X))
 
 Event alarm          : alarm(X)
 Event sonar 		 : p(Distance, Angle) 
@@ -10,7 +11,7 @@ Event sonar 		 : p(Distance, Angle)
 Dispatch photograph  : ph(X)
 
 Context  ctxRadar      ip [ host="172.20.10.2" port=8033 ] -httpserver
-EventHandler evhr for sonar ;
+EventHandler evhr for sonar, obstacle ;
 Context  ctxSensorEmitter  ip [ host="172.20.10.3" port=8133 ] //Primo sonar del muro
 //Context  ctxSensorEmitter  ip [ host="172.20.10.4" port=8133 ] //Secondo sonar del muro
 
@@ -37,11 +38,24 @@ QActor radargui context ctxRadar {
 	Plan checkObstacle
 		actions[
 			println("checkObstacle") ;
-			onEvent sonar : p(D,A) -> actorOp sendDataToGui(D,A) ;
-			onEvent sonar : p(D,A) -> actorOp checkSonars(D,A) ;
-			onEvent cmd	  : cmd(start) -> actorOp reset 	 
+			onEvent sonar : p(D,A) -> actorOp sendDataToGui(D,A)  
 		]  
-		switchTo doWorkMsgs
+		reactive [?? p(D,A)] actorOp checkSonars(D,A) 
+		whenEnd -> doWorkMsgs
+		whenTout 55 -> doWorkMsgs
+		whenEvent cmd -> reset
+		or whenEvent alarm -> reset
+		or whenEvent usercmd -> reset
+		or whenEvent obstacle -> reset
+	
+	Plan reset 
+		actions[
+			println("Sono nel piano reset") ;
+			actorOp reset
+		]
+		transition
+		whenTime 86400000 -> reset
+		whenEvent cmd -> doWorkMsgs
 	
 }
 
@@ -137,14 +151,14 @@ Robot ioRobot QActor robot_actor context ctxRobot {
             
 	Rules {           
 		tforward(5000).
-		tturnright(550).
-	    tturnleft(300).
+		tturnright(450).
+	    tturnleft(350).
 	 }
 	  
 	 Plan init normal 
 		actions [
-	    	actorOp connectToSend;
-	      	actorOp createPi4jLed(23) ;
+	    	actorOp connectToSend; 
+	      	actorOp createPi4jLed ;
 	      	actorOp createPiCamera ;
 	      	println("-------------");
 	      	println("ioRobot: A robot performs a move in reactive way"  );
@@ -156,7 +170,7 @@ Robot ioRobot QActor robot_actor context ctxRobot {
 		actions [
 	    	println("startWalking")
 		]
-	    reactive [!? tforward(T)] robotForward speed(40) time(T)
+	    reactive [!? tforward(T)] robotForward speed(60) time(T)
 	    whenEnd          	  		  -> startWalking
 	    whenTout 6000        	  	  -> handleTout
 	    whenEvent obstacle    		  -> stopWalking
@@ -171,18 +185,18 @@ Robot ioRobot QActor robot_actor context ctxRobot {
 	    ]
 	    transition
 	    whenTime 86400000 -> stopWalking
-	    whenEvent cmd -> startWalking // per l'evento start ricevuto da console
+	    whenEvent cmd -> startWalking // per l'evento start/stop ricevuto da console
 	
 	Plan reachedSensor
 		actions [
 	    	println("reachedSensor");
 	      	robotStop speed(1) time(1);
-	      	[!? tturnleft(T)] robotLeft speed(40) time (T); //girare a sinistra di 90°
+	      	[!? tturnleft(T)] robotLeft speed(60) time (T); //girare a sinistra di 90°
 	      	delay time(2000);
 	      	actorOp startBlink;
 	      	actorOp sendMsgMqtt ;
 	      	delay time(2000);
-	      	[!? tturnright(T)] robotRight speed(40) time (T); //girare a destra di 90°
+	      	[!? tturnright(T)] robotRight speed(60) time (T); //girare a destra di 90°
 	      	delay time(2000);
 	      	actorOp stopBlink
 	    ] 

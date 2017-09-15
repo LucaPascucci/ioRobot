@@ -11,6 +11,8 @@ import it.unibo.qactors.QActorUtils;
 
 public class Robotsonar extends AbstractRobotsonar { 
 	private BufferedReader readerC;
+	private int[] sensorData = new int[2];
+	private int i = 0;
 
 	public Robotsonar(String actorId, QActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
 		super(actorId, myCtx, outEnvView);
@@ -30,10 +32,18 @@ public class Robotsonar extends AbstractRobotsonar {
 	public void getDistanceFromSonar() {
 		try {
 			String strDistance = this.readerC.readLine();
-			int distance = Integer.parseInt(strDistance);
-			println("RobotSonar " + distance);
-			if (distance < 10) {
-				QActorUtils.raiseEvent(this.getQActorContext(), "sensor", "obstacle", "obstacle(" + distance + ")");
+			this.sensorData[this.i % 2] = Integer.parseInt(strDistance);
+			this.i++;
+			if (this.i >= 2) {
+				int sum = 0;
+				for (int k : this.sensorData) {
+					sum += k;
+				}
+				int average = sum / 2;
+				if (average < 10) {
+					QActorUtils.raiseEvent(this.getQActorContext(), "sensor", "obstacle", "obstacle(" + average + ")");
+				}
+				println("RobotSonar " + average);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
