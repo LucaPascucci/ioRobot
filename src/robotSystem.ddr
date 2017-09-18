@@ -71,7 +71,7 @@ QActor alarmhandler context ctxRadar {
 		whenTime 86400000 -> init
 		whenEvent alarm -> handleAlarm
 		
-	Plan handleAlarm resumeLastPlan
+	Plan handleAlarm
 		actions[
 			sound time(7000) file('./audio/alarm_sound.wav')
 		]
