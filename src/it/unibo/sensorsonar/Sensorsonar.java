@@ -11,8 +11,6 @@ import it.unibo.qactors.QActorContext;
 public class Sensorsonar extends AbstractSensorsonar {
 	protected BufferedReader readerC;
 	protected int counter = 1;
-//	private int[] sensorData = new int[2];
-//	private int i = 0;
 
 	public Sensorsonar(String actorId, QActorContext myCtx, IOutputEnvView outEnvView) throws Exception {
 		super(actorId, myCtx, outEnvView);

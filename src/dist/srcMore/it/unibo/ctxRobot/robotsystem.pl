@@ -2,8 +2,8 @@
 % Context ctxRobot  SYSTEM-configuration: file it.unibo.ctxRobot.robotSystem.pl 
 %====================================================================================
 context(ctxradar, "172.20.10.2",  "TCP", "8033" ).  		 
-context(ctxsensoremitter, "172.20.10.4",  "TCP", "8133" ).  		 
-context(ctxrobot, "172.20.10.14",  "TCP", "8079" ).  		 
+context(ctxsensoremitter, "172.20.10.3",  "TCP", "8133" ).  		 
+context(ctxrobot, "172.20.10.5",  "TCP", "8079" ).  		 
 %%% -------------------------------------------
 qactor( radargui , ctxradar, "it.unibo.radargui.MsgHandle_Radargui"   ). %%store msgs 
 qactor( radargui_ctrl , ctxradar, "it.unibo.radargui.Radargui"   ). %%control-driven 
